@@ -134,7 +134,6 @@ int main(int argc, char** argv)
                 s.dropPrivUser = strdup(optarg);
                 break;
             default: /* '?' */
-                fprintf(stderr, "Invalid usage\n");
                 goto cleanup;
         }
     }

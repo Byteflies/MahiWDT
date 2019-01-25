@@ -150,13 +150,13 @@ int main(int argc, char** argv)
 
     /* Run the wdt logic */
     bool cleanExit = logicRun(&s, &die);
+    
+    /* 1) A channel timed out, reset the HW wdt */
+    for(WDTHWDriver* driver = s.wdtDriver; driver; driver=driver->next) {
+        wdtDriverKick(driver);
+    }
 
     if(!cleanExit) {
-        /* 1) A channel timed out, reset the HW wdt */
-        for(WDTHWDriver* driver = s.wdtDriver; driver; driver=driver->next) {
-            wdtDriverKick(driver);
-        }
-
         /* 2) and try to do a clean reboot. */
         if(s.rebootCmd) {
             printf("Running: %s\n", s.rebootCmd);

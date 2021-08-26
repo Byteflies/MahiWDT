@@ -95,6 +95,7 @@ bool logicRun(WDTSystem* s, volatile bool* die);
 
 WDTHWDriver* kernelWDTDriverNew(const char* path, int interval);
 WDTHWDriver* dummyWDTDriverNew(unsigned int interval);
+WDTHWDriver* i2cWDTDriverNew(const char* bus, uint8_t addr, char* wrData, unsigned int interval);
 
 uint64_t utilGetUptimeSeconds();
 

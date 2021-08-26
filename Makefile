@@ -35,7 +35,7 @@ LDFLAGS=
 
 EXECUTABLE=mahiwdt
 INCLUDES=project.h
-SOURCES=hwwdt.c logic.c main.c port.c priv.c util.c drivers/dummywdt.c drivers/kernelwdt.c
+SOURCES=hwwdt.c logic.c main.c port.c priv.c util.c drivers/dummywdt.c drivers/kernelwdt.c drivers/i2cwdt.c
 
 OBJECTS_OBJ=$(addprefix obj/,$(SOURCES:.c=.o))
 INCLUDES_SRC=$(addprefix src/,$(INCLUDES))

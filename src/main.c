@@ -84,8 +84,20 @@ int main(int argc, char** argv)
                     } else {
                         errno = EINVAL;
                     }
+                } else if(!strcmp(driver, "i2c")) {
+                    char* bus = strtok(NULL, ":");
+                    char* addr = strtok(NULL, ":");
+                    char* wrdata = strtok(NULL, ":");
+                    char* interval = strtok(NULL, ":");
+
+                    if(bus && addr && wrdata && interval) {
+                        newDriver = i2cWDTDriverNew(bus, strtol(addr, NULL, 0), wrdata, atoi(interval));
+                    } else {
+                        errno = EINVAL;
+                    }
                 } else if(!strcmp(driver, "dummy")) {
                     char* interval = strtok(NULL, ":");
+
                     if(interval) {
                         newDriver = dummyWDTDriverNew(atoi(interval));
                     } else {

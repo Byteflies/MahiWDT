@@ -29,8 +29,9 @@
 #include <linux/i2c-dev.h>
 
 struct i2cWDTContext {
-    int fd;
-
+    char* bus;
+    uint8_t addr;
+    
     char* data;
     unsigned int dataLen;
 };
@@ -40,10 +41,9 @@ static void i2cWDTDriverFree(void* context)
     struct i2cWDTContext* c = (struct i2cWDTContext*)context;
 
     if(c) {
-        if(c->fd >= 0) {
-            close (c->fd);
+        if (c->bus) {
+            free(c->bus);
         }
-
         if (c->data) {
             free(c->data);
         }
@@ -55,8 +55,16 @@ static void i2cWDTDriverFree(void* context)
 static void i2cWDTDriverKick(void* context)
 {
     struct i2cWDTContext* c = (struct i2cWDTContext*)context;
+    
+    int fd = open(c->bus, O_RDWR);
+    if(fd < 0) return;
 
-    write(c->fd, c->data, c->dataLen);
+    if (ioctl(fd, I2C_SLAVE, c->addr) < 0) goto failed;
+
+    write(fd, c->data, c->dataLen);
+
+failed:
+    close(fd);
 }
 
 WDTHWDriver* i2cWDTDriverNew(const char* bus, uint8_t addr, char* wrData, unsigned int interval)
@@ -70,13 +78,12 @@ WDTHWDriver* i2cWDTDriverNew(const char* bus, uint8_t addr, char* wrData, unsign
     d->wdtContext = c;
     d->wdtFreeFunc = i2cWDTDriverFree;
     d->wdtKickFunc = i2cWDTDriverKick;
-
-    c->fd = open(bus, O_RDWR);
-    if(c->fd < 0) goto failed;
-
-    if (ioctl(c->fd, I2C_SLAVE, addr) < 0) goto failed;
-
     d->wdtMaxIntervalSeconds = interval;
+    
+    c->bus = strdup(bus);
+    if(!c->bus) goto failed;
+
+    c->addr = addr;
 
     size_t len = strlen(wrData);
     if (len % 2) goto failed;

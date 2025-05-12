@@ -118,6 +118,9 @@ bool logicRun(WDTSystem* s, volatile bool* die)
                             }
                         } else if(recvLen == 4 && memcmp(rxBuf, "KICK", 4) == 0) {
                             portKick(port, false);
+                        } else if(recvLen == 5 && memcmp(rxBuf, "ERROR", 5) == 0) {
+                            fprintf(stderr, "Watchdog ERROR on channel %s\n", port->laddr.sun_path);
+                            return false;
                         }
                     }
                     i++;
